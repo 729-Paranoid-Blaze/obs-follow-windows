@@ -1,4 +1,4 @@
-"""A script to move OBS window captures to where they are on the screen."""
+"""A script to move OBS sources to where they are on the screen."""
 import obspython as obs
 import pygetwindow as gw
 import itertools
@@ -55,21 +55,11 @@ def loop():
 
 def update_window_pos(window_name, source, current_scene):
     """Update the position of a window."""
-    # Gets the window that the window name corresponds to
-    window = gw.getWindowsWithTitle(window_name)
-    if window:
-        window = window[0]
-    else:
-        return
-    # The window's dimensions (excluding borders + titles bars)
-    top = window.top
-    left = window.left
-    bottom = window.bottom
-    right = window.right
     pos = obs.vec2()
-
     window = win32gui.FindWindow(None, window_name)
-
+    if not window:
+        return
+    left, top, right, bottom = win32gui.GetWindowRect(window)
     # The total area of the window
     total_rect = win32gui.GetWindowRect(window)
     total_height = total_rect[3] - total_rect[1]
@@ -101,7 +91,7 @@ def update_window_pos(window_name, source, current_scene):
             pos.x = 0
         if right > screen_width:
             pos.x = (screen_width - client_width)
-        if top < 0 - title_bar_height - (2 * y_frame):
+        if top < 0:
             pos.y = 0
         if bottom > screen_height:
             pos.y = (screen_height - client_height)
@@ -119,6 +109,23 @@ def update_window_pos(window_name, source, current_scene):
         obs.obs_sceneitem_set_pos(scene_item, pos)
 
 
+def has_border(window):
+    """Get if a window has a border around it."""
+    style = win32gui.GetWindowLong(window, win32con.GWL_STYLE)
+    border_styles = win32con.WS_BORDER | win32con.WS_THICKFRAME
+    return (style & border_styles) != 0
+
+
+def get_obs_window_name(source):
+    """Get a source's window name from its properties in obs."""
+    settings = obs.obs_source_get_settings(source)
+    window_name = obs.obs_data_get_string(settings, "window")
+    obs.obs_data_release(settings)
+    if ":" in window_name:
+        window_name = window_name.split(":")[0]
+    return window_name
+
+
 def script_properties():
     """The dropdown menu to select windows to follow."""
     properties = obs.obs_properties_create()
@@ -134,13 +141,6 @@ def script_properties():
     # Fill the dropdown list with available sources
     fill_dropdown(dropdown)
     return properties
-
-
-def has_border(window):
-    """Get if a window has a border around it."""
-    style = win32gui.GetWindowLong(window, win32con.GWL_STYLE)
-    border_styles = win32con.WS_BORDER | win32con.WS_THICKFRAME
-    return (style & border_styles) != 0
 
 
 def fill_dropdown(dropdown):
@@ -169,19 +169,8 @@ def fill_dropdown(dropdown):
             )
 
 
-def get_obs_window_name(source):
-    """Get a source's window name from its properties in obs."""
-    settings = obs.obs_source_get_settings(source)
-    window_name = obs.obs_data_get_string(settings, "window")
-    obs.obs_data_release(settings)
-    if ":" in window_name:
-        window_name = window_name.split(":")[0]
-    return window_name
-
-
 def script_update(settings):
-    """Get the user's input for the dropdown menu. Called when the user
-    interacts with the dropdown."""
+    """Get inputs when the settings for the script are interacted with."""
     global program_names, keep_in_bounds
     # Get the program names that have been selected
     source_names = obs.obs_data_get_string(settings, "source_names")
@@ -207,7 +196,7 @@ def script_unload():
 
 
 def script_description():
-    """The description of the window follower program."""
+    """The description for the follow windows program."""
     return ("𝔽𝕠𝕝𝕝𝕠𝕨 𝕎𝕚𝕟𝕕𝕠𝕨𝕤\n"
             "Follow windows on your screen.\n\n"
             "Enter the names of the windows that you want to follow.\n\n"
