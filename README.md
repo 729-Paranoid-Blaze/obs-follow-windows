@@ -24,6 +24,7 @@ pip install -r requirements.txt
 
 This script updates the position of the sources corresponding to these window names based on the position of the windows.
 Both window captures and game captures can be followed.
+
 8) If you want to keep the sources within the boundaries of your screen, tick the checkbox.
 
 ## Useful information
