@@ -200,7 +200,7 @@ def script_description():
     return ("𝔽𝕠𝕝𝕝𝕠𝕨 𝕎𝕚𝕟𝕕𝕠𝕨𝕤\n"
             "Follow windows on your screen.\n\n"
             "Enter the names of the windows that you want to follow.\n\n"
-            "You can enter incomplete window names so that the program "
+            "You can enter incomplete window names so that this script "
             "continues to follow the window if its name changes, e.g. "
             "'Google Chrome' for 'New Tab - Google Chrome'. \n"
             "Just make sure that each window name can only correspond to 1 "
