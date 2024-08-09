@@ -11,7 +11,8 @@ This script functions similar to: https://github.com/henke37/window-follower, bu
 ```bash
 pip install -r requirements.txt
 ```
-3) After downloading this script, open OBS and go to Tools -> Scripts, and add this script (obs-follow-windows.py) with the "+" button.
+3) [Download the script.](./follow-windows.py)
+4) Open OBS and go to Tools -> Scripts, and add this script (obs-follow-windows.py) with the "+" button.
 4) Enter the names of the windows that you want OBS to follow, separated by a comma, e.g. "Minecraft, Google Chrome".
 
 This script updates the position of the sources corresponding to these window names based on the position of the windows.
